@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'core',
     'drf_spectacular',
     'user',
+    'recipe'
 ]
 
 MIDDLEWARE = [
