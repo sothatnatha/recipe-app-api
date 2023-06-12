@@ -56,7 +56,7 @@ class TestModels(TestCase):
         recipe = models.Recipe.objects.create(
             user = user,
             title = 'A mock recipe name.',
-            time_minute = 5,
+            time_minutes = 5,
             price =  Decimal(3.50),
             description='Sample receipe description.',
         )
