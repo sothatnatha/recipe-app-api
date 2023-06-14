@@ -157,6 +157,7 @@ class PrivateRecipeApiTests(TestCase):
             'time_minutes': 20,
             'price': Decimal('5.20'),
         }
+        
         url = detail_url(recipe.id)
         res = self.client.put(url, payload)
 
