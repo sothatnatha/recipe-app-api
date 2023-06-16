@@ -48,6 +48,7 @@ class TagViewset(mixins.ListModelMixin,
     
 class IngredientViewset(mixins.ListModelMixin, 
                         mixins.UpdateModelMixin, 
+                        mixins.DestroyModelMixin,
                         viewsets.GenericViewSet):
     """View manage ingredients in the database."""
     serializer_class = serializers.IngredientSerializer
