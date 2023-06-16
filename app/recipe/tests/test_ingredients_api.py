@@ -15,6 +15,9 @@ from core.models import Ingredient
 
 INGREDIENTS_URL = reverse('recipe:ingredient-list')
 
+def detail_url(ingredient_id):
+    """Return ingredient detail url"""
+    return reverse('recipe:ingredient-detail', args=[ingredient_id])
 
 def create_user(email="user@example.com", password="testpassword"):
     """Create a new user for tags apis."""
@@ -68,3 +71,14 @@ class PrivateIngredientAPITest(TestCase):
         self.assertEqual(res.data[0]['name'], ingredient.name)
         self.assertEqual(res.data[0]['id'], ingredient.id)
 
+    def test_update_ingredient(self):
+        """Test updating an ingredient"""
+        ingredient = Ingredient.objects.create(user=self.user, name='Cilantro')
+
+        payload = {'name': 'Water melon'}
+        url = detail_url(ingredient.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        ingredient.refresh_from_db()
+        self.assertEqual(ingredient.name, payload['name'])
