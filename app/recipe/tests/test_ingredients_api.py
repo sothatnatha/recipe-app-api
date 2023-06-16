@@ -13,13 +13,13 @@ from recipe.serializers import IngredientSerializer
 
 from core.models import Ingredient
 
-INGREDIENT_URL = 'recipe:ingredient-list'
+INGREDIENTS_URL = reverse('recipe:ingredient-list')
 
 
-def create_user(email="test@example.com", password="testpassword"):
+def create_user(email="user@example.com", password="testpassword"):
     """Create a new user for tags apis."""
 
-    return get_user_model().objects.create_user(emai=email, password=password)
+    return get_user_model().objects.create_user(email=email, password=password)
 
 class PublicIngredientAPITest(TestCase):
     """Test the publicly available ingredients API"""
@@ -29,7 +29,7 @@ class PublicIngredientAPITest(TestCase):
 
     def test_auth_required(self):
         """Test that authentication is required"""
-        res = self.client.get(INGREDIENT_URL)
+        res = self.client.get(INGREDIENTS_URL)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -37,6 +37,7 @@ class PrivateIngredientAPITest(TestCase):
     """Test Unauthenticated API requests."""
 
     def setUp(self)  :
+        self.user = create_user()
         self.client = APIClient()
         self.client.force_authenticate(self.user)
 
@@ -45,7 +46,7 @@ class PrivateIngredientAPITest(TestCase):
         Ingredient.objects.create(user=self.user, name='Cucumber')
         Ingredient.objects.create(user=self.user, name='Tomato')
 
-        res = self.client.get(INGREDIENT_URL)
+        res = self.client.get(INGREDIENTS_URL)
         ingredients = Ingredient.objects.all().order_by('-name')
         serailizer = IngredientSerializer(ingredients, many=True)
 
@@ -55,12 +56,12 @@ class PrivateIngredientAPITest(TestCase):
 
     def test_tags_limited_to_user(self):
         """Test that tags returned are for the authenticated user"""
-        
+
         user2 = create_user(email='user2@example.com', password='testpassword')
         Ingredient.objects.create(user=user2, name='Salt')
         ingredient = Ingredient.objects.create(user=self.user, name='Pepper')
 
-        res = self.client.get(INGREDIENT_URL)
+        res = self.client.get(INGREDIENTS_URL)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
