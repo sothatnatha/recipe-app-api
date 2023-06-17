@@ -6,8 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from django.contrib.auth import get_user_model
-from core.models import Recipe, Tag
-
+from core.models import Recipe, Tag, Ingredient
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -300,3 +299,56 @@ class PrivateRecipeApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(recipe.tags.count(), 0)
+
+    def test_create_recipe_with_new_gradient(self):
+        """Test creating a recipe with a new gradient."""
+        payload = {
+            'title': 'Taco Factory',
+            'time_minutes': 12,
+            'price': Decimal('2.99'),
+            'gradients': [{'name': 'Factory'}, {'name': 'Taco'}],
+        }
+
+        res = self.client.post(RECIPES_URL, payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        recipes = Recipe.objects.filter(user=self.user)
+        self.assertEqual(recipes.count(), 1)
+        recipes = recipes[0]
+        self.assertEqual(recipes.ingredients.count(), 2)
+
+        for ingradient in payload['ingradients']:
+            exists = recipes.ingredients.filter(
+                name=ingradient['name'],
+                user = self.user,
+            ).exists()
+            self.assertTrue(exists)
+
+    def test_create_recipe_with_existing_ingradients(self):
+        """Test creating a recipe with existing gradients."""
+
+        ingradient = Ingredient.objects.create(user=self.user, name='Lemon')
+
+        payload = {
+            'title': 'Cambodian Soup',
+            'time_minutes': 20,
+            'price': Decimal('5.99'),   
+            'ingradients': [
+                {'name': 'Lemon'},
+                {'name': 'Cambodian'},
+            ]
+        }
+
+        res = self.client.post(RECIPES_URL, payload, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        recipes = Recipe.objects.filter(user=self.user)
+        self.assertEqual(recipes.count(), 1)
+        recipe = recipes[0]
+        self.assertEqual(recipe.ingredients.count(), 2)
+        self.assertIn(ingradient, recipe.ingredients.all())
+
+        for ingradient in payload['ingradients']:
+            exists = recipe.ingredients.filter(
+                name=ingradient['name'],
+                user = self.user,
+            ).exists()
+            self.assertTrue(exists)
