@@ -38,6 +38,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def _get_or_create_tags(self, tags, recipe):
         """Handle getting or creating tags."""
+        
         auth_user = self.context['request'].user
         for tag in tags:
             tag_obj, created = Tag.objects.get_or_create(
@@ -49,6 +50,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def _get_or_create_ingredients(self, ingredients, recipe):
         """Handle getting or creating ingredients as needed."""
+
         auth_user = self.context['request'].user
         for ingredient in ingredients:
             ingredient_obj, created = Ingredient.objects.get_or_create(
@@ -59,6 +61,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create and return a new recipe."""
+
         tags = validated_data.pop('tags', [])
         ingredients = validated_data.pop('ingredients', [])
         recipe = Recipe.objects.create(**validated_data)
@@ -69,6 +72,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """Update recipe."""
+
         tags = validated_data.pop('tags', None)
         ingredients = validated_data.pop('ingredients', [])
 
@@ -87,6 +91,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 class RecipeDetailSerializer(RecipeSerializer):
     """Serializer for the recipe detail object."""
+
     class Meta(RecipeSerializer.Meta):
         fields = RecipeSerializer.Meta.fields + ['description']
 
