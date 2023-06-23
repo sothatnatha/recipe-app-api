@@ -25,8 +25,8 @@ from recipe import serializers
 @extend_schema_view(
     list=extend_schema(
         parameters=[
-            OpenApiParameter('tags', OpenApiTypes.STR),
-            OpenApiParameter('ingredients', OpenApiTypes.STR),
+            OpenApiParameter('tags', OpenApiTypes.STR, description='Comma separated list of tags.'),
+            OpenApiParameter('ingredients', OpenApiTypes.STR, description='Comma separated list of ingredients.'),
         ]
     )
 )
@@ -97,7 +97,7 @@ class RecipeViewset(viewsets.ModelViewSet):
 @extend_schema_view(
     list=extend_schema(
         parameters=[
-           OpenApiParameter('assigned_only', OpenApiTypes.INT, enum=[0, 1]),
+           OpenApiParameter('assigned_only', OpenApiTypes.INT, enum=[0, 1], description='Filter by items assigned to recipes.',),
         ]
     )
 )
